@@ -1,0 +1,22 @@
+{
+  "name": "pull-req-label",
+  "version": "0.2",
+  "description": "pull-reqにレビュー中とかラベルを設定する。",
+  "background": { "scripts": ["jquery-2.0.3.min.js", "jquery.base64.min.js", "background.js"] },
+  "page_action" :
+  {
+    "default_icon" : "icon-19-normal.png",
+    "default_title" : "Pull-Requestのページで動作します"
+  },
+  "permissions" : [
+    "tabs",
+    "cookies",
+    "*://*/"
+  ],
+  "icons" : {
+    "48" : "icon-48.png",
+    "128" : "icon-128.png"
+  },
+  "manifest_version": 3,
+  "options_page": "options.html"
+}

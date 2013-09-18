@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="options.js"></script>
+    <title>設定</title>
+  </head>
+  <body>
+    <h1>設定</h1>
+    <form class="setting">
+      <div>
+        <label>
+          APIプレフィックス("https://api.github.com/"とか"https://yourdomain.example.com/api/v3/"とか):<br />
+          <input type="text" class="api_prefix" size="64" />
+        </label>
+      </div>
+      <div>
+        <label>
+          ユーザー名:<br />
+          <input type="text" class="username" />
+        </label>
+      </div>
+      <div>
+        <label>
+          パスワード(Personal Access Tokensを推奨):<br />
+          <input type="text" class="password" />
+        </label>
+      </div>
+      <div>
+        <button type="submit" class="save">保存</button>
+      </div>
+    </form>
+  </body>
+</html>
