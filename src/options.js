@@ -1,21 +1,34 @@
 $(function() {
-    $('.api_prefix').val(localStorage.getItem('api_prefix'));
-    $('.username').val(localStorage.getItem('username'));
-    $('.password').val(localStorage.getItem('password'));
-
-    $('.setting').on('submit', function(event) {
-        var api_prefix = $('.api_prefix').val();
-        var username = $('.username').val();
-        var password = $('.password').val();
-        if (!api_prefix || !username || !password) {
-            $('.save').text('全項目を入力してください');
-            return false;
+    function getConfig(type, key) {
+        return localStorage.getItem(type + '-' + key);
+    }
+    function setConfig(type, key, value) {
+        localStorage.setItem(type + '-' + key, value);
+    }
+    ['github', 'ghe'].forEach(function(type, i) {
+        var $form = $('#form-'+type+'.setting');
+        if (!$form.find('.api_prefix').val()) {
+            $form.find('.api_prefix').val(getConfig(type, 'api_prefix'));
         }
+        $form.find('.username').val(getConfig(type, 'username'));
+        $form.find('.password').val(getConfig(type, 'password'));
 
-        localStorage.setItem('api_prefix', api_prefix);
-        localStorage.setItem('username', username);
-        localStorage.setItem('password', password);
-        $('.save').text('保存しました');
-        return false;
+
+        $form.on('submit', function(e) {
+            var api_prefix = $form.find('.api_prefix').val();
+            var username = $form.find('.username').val();
+            var password = $form.find('.password').val();
+            if (!api_prefix || !username || !password) {
+                $form.find('.save').text('全項目を入力してください');
+                return false;
+            }
+
+            setConfig(type, 'api_prefix', api_prefix);
+            setConfig(type, 'username', username);
+            setConfig(type, 'password', password);
+
+            $form.find('.save').text('保存しました');
+            return false;
+        });
     });
 });
