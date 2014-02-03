@@ -1,10 +1,21 @@
-function getApiPrefix() {
-    return localStorage.getItem('api_prefix');
+function getType(url) {
+    var regex = /(https?:\/\/.*.+?\..+?)\//;
+    var matches = url.match(regex);
+    var heading = matches[1];
+    if ( "https://github.com".indexOf(heading) === 0 ) {
+        return 'github';
+    } else if ( localStorage.getItem('ghe-api_prefix').indexOf(heading) === 0) {
+        return 'ghe';
+    }
 }
 
-function getHostFromApiPrefix() {
+function getApiPrefix(type) {
+    return localStorage.getItem(type + '-api_prefix');
+}
+
+function getHostFromApiPrefix(type) {
     var regex = /https?:\/\/.*(.+?\..+?)\//;
-    var match = getApiPrefix().match(regex);
+    var match = getApiPrefix(type).match(regex);
     return match ? match[1] : '';
 }
 
@@ -13,7 +24,7 @@ function getHostFromApiPrefix() {
  */
 function getParamsFromUrl(url) {
     // 期待しないURLでアイコン出さないように、それっぽいホストか一応チェックする
-    var host = getHostFromApiPrefix();
+    var host = getHostFromApiPrefix(getType(url));
     if (url.indexOf(host) == -1) {
         return null;
     }
@@ -85,9 +96,9 @@ function setBackground(tabId, state) {
  * 認証キーをlocalStorageから取得する
  * 見つからなかったらpromptで入力させる(一発勝負)
  */
-function getAuthorization() {
-    var username = localStorage.getItem('username');
-    var password = localStorage.getItem('password');
+function getAuthorization(type) {
+    var username = localStorage.getItem(type + '-username');
+    var password = localStorage.getItem(type + '-password');
     if (!username || !password) {
         chrome.tabs.create({
             url: chrome.extension.getURL('options.html')
@@ -108,9 +119,9 @@ function checkForGithubUrl(tabId, changeInfo, tab) {
     var params = getParamsFromUrl(tab.url);
     if (params) {
         chrome.pageAction.show(tabId); // これ呼ばないとアイコン表示されない
-        var authorization = getAuthorization();
+        var authorization = getAuthorization(getType(tab.url));
         $.ajax({
-            url: getApiPrefix() + 'repos/' + params.user + '/' + params.repo + '/issues/' + params.issue + '/labels',
+            url: getApiPrefix(getType(tab.url)) + 'repos/' + params.user + '/' + params.repo + '/issues/' + params.issue + '/labels',
             cache: false,
             type: 'GET',
             headers: {'Authorization': authorization},
@@ -138,12 +149,12 @@ chrome.tabs.onUpdated.addListener(checkForGithubUrl); // コールバック登�
  */
 chrome.pageAction.onClicked.addListener(function(tab) {
     var params = getParamsFromUrl(tab.url);
-    var authorization = getAuthorization();
+    var authorization = getAuthorization(getType(tab.url));
     // 現在の状態を取得して、次の状態を決定する
     var currentState = null;
     var nextState = 'レビュー依頼';
     $.ajax({
-        url: getApiPrefix() + 'repos/' + params.user + '/' + params.repo + '/issues/' + params.issue + '/labels',
+        url: getApiPrefix(getType(tab.url)) + 'repos/' + params.user + '/' + params.repo + '/issues/' + params.issue + '/labels',
         cache: false,
         type: 'GET',
         headers: {'Authorization': authorization},
@@ -173,7 +184,7 @@ chrome.pageAction.onClicked.addListener(function(tab) {
         // レビュー状態のラベルを削除する
         if (currentState) {
             $.ajax({
-                url: getApiPrefix() + 'repos/' + params.user + '/' + params.repo + '/issues/' + params.issue + '/labels/' + currentState,
+                url: getApiPrefix(getType(tab.url)) + 'repos/' + params.user + '/' + params.repo + '/issues/' + params.issue + '/labels/' + currentState,
                 cache: false,
                 type: 'DELETE',
                 headers: {'Authorization': authorization},
@@ -182,7 +193,7 @@ chrome.pageAction.onClicked.addListener(function(tab) {
         // 次の状態へラベルを遷移させる
         if (nextState) {
             $.ajax({
-                url: getApiPrefix() + 'repos/' + params.user + '/' + params.repo + '/issues/' + params.issue + '/labels',
+                url: getApiPrefix(getType(tab.url)) + 'repos/' + params.user + '/' + params.repo + '/issues/' + params.issue + '/labels',
                 cache: false,
                 type: 'POST',
                 headers: {'Authorization': authorization},
