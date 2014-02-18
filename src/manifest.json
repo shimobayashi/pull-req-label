@@ -1,6 +1,6 @@
 {
   "name": "pull-req-label",
-  "version": "0.2",
+  "version": "0.3",
   "description": "pull-reqにレビュー中とかラベルを設定する。",
   "background": { "scripts": ["jquery-2.0.3.min.js", "jquery.base64.min.js", "background.js"] },
   "page_action" :
