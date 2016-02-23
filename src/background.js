@@ -71,6 +71,9 @@ function serializeFunction(f, args) {
  */
 
 function setBackground(tabId, state) {
+    var set_background = localStorage.getItem('global-set_background');
+    if (! set_background || typeof set_background == 'string' && ! JSON.parse(set_background)) { return }
+
     chrome.tabs.executeScript(tabId, {
         code: serializeFunction(function() {
             var state = arguments[0];
@@ -140,7 +143,7 @@ function checkForGithubUrl(tabId, changeInfo, tab) {
             updateIcon(tabId, state);
         });
     }
-};
+}
 chrome.tabs.onUpdated.addListener(checkForGithubUrl); // コールバック登録
 
 /*
