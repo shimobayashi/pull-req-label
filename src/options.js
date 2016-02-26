@@ -8,7 +8,9 @@ $(function() {
 
     // どのドメインでも使われる設定
     var $option_form = $('#form-option');
-    $option_form.find('.set-background').prop('checked', getConfig('global', 'set-background'));
+    if (getConfig('global', 'set_background')) {
+        $option_form.find('.set_background').prop('checked', JSON.parse(getConfig('global', 'set_background')));
+    }
     $option_form.on('submit', function(e) {
         var set_background = $option_form.find('.set_background').prop('checked');
         setConfig('global', 'set_background', set_background);
